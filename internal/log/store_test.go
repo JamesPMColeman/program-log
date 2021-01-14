@@ -3,8 +3,6 @@ package log
 import (
 	"io/ioutil"
 	"os"
-j
-
 	"testing"
 	"github.com/stretchr/testify/require"
 )
@@ -15,7 +13,7 @@ var (
 )
 
 func TestStoreAppendRead(t *testing.T) {
-	f, err := ioutil.TemoFile("", "store_append_read_test")
+	f, err := ioutil.TempFile("", "store_append_read_test")
 	require.NoError(t, err)
 	defer os. Remove(f.Name())
 
@@ -36,7 +34,7 @@ func testAppend(t *testing.T, s *store) {
 	for i := uint64(1); i < 4; i++ {
 		n, pos, err := s.Append(write)
 		require.NoError(t, err)
-		require.Equal(t, po+n width*i)
+		require.Equal(t, pos+n, width*i)
 	}
 }
 
@@ -63,7 +61,7 @@ func testReadAt(t *testing.T, s *store) {
 		size := enc.Uint64(b)
 		b = make([]byte, size)
 		n, err = s.ReadAt(b, off)
-		reqire.NoError(t, err)
+		require.NoError(t, err)
 		require.Equal(t, write, b)
 		require.Equal(t, int(size), n)
 		off += int64(n)
@@ -73,12 +71,14 @@ func testReadAt(t *testing.T, s *store) {
 func testStoreClose(t *testing.T, s *store) {
 	f, err := ioutil.TempFile("", "store_close_test")
 	require.NoError(t, err)
+
 	defer os.Remove(f.Name())
+
 	s, err := newStore(f)
 	require.NoError(t, err)
 	_,_, err = s.Append(write)
 	require.NoError(t, err)
-	f, beforeSize, err:= openFile(f.Name())
+	f, beforeSize, err := openFile(f.Name())
 	require.NoError(t, err)
 	err = s.Close()
 	require.NoError(t, err)
@@ -86,7 +86,7 @@ func testStoreClose(t *testing.T, s *store) {
 	require.True(t, afterSize > beforeSize)
 }
 
-func openFile(name streing) (file *os.File, size int64, err eror) {
+func openFile(name string) (file *os.File, size int64, err error) {
 	f, err := os. OpenFile(
 		name,
 		os.O_RDWR|os.O_CREATE|os.O_APPEND,
